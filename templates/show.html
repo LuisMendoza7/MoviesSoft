@@ -1,0 +1,34 @@
+{% extends 'movies.html' %}
+  {% block body %}
+    <h1>Movies Database</h1>
+    {% if show_message %}
+      <p>{{movies}}</p>
+      {% elif show_message == False %}
+        <p>Movies in the database:</p>
+        <table>
+          <tr>
+            <th>Name</th>
+            <th>Year</th>
+            <th>Director</th>
+          </tr>
+          {% for movie in movies %}
+            <tr>
+              <form method="POST" action="modify">
+                <input type="hidden" name="moviename" value="{{movie.Name}}">
+                <td><input name="name" value="{{movie.Name}}"></td>
+                <td><input name="year" value="{{movie.Year}}"></td>
+                <td><input name="director" value="{{movie.Director}}"></td>
+                <td><button type="submit">Modify Movie.</button></td>
+              </form>
+              <form method="POST" action="delete">
+                <input type="hidden" name="name" value={{movie.Name}}>
+                <td><button type="submit">Delete Movie.</button></td>
+              </form>
+            </tr>
+          {% endfor %}
+        </table>
+        <p>{{message}}</p>
+    {% endif %}
+    <a href="home">Return to Home.</a>
+    <a href="add">Add a movie.</a>
+{% endblock %}

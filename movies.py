@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template, url_for, redirect
 app = Flask("Movies DataBase")
 
 class Movies:
@@ -23,15 +23,16 @@ class Movies:
     def show_movies(self):
         if len(self.movies_list) == 0:
             return "There are no movies in the database."
-        return jsonify(self.movies_list)
+        return self.movies_list
 
     def delete_movie(self, *args):
         new_movies = [movie for movie in self.movies_list if movie["Name"] != args[0]]
         self.movies_list = new_movies
-        return jsonify(self.movies_list)
 
     def movie_check(self, *args):
         movie_exists = list(filter(lambda key: key["Name"] == args[0], self.movies_list))
+        print (args[0])
+        print (movie_exists)
         if len(self.movies_list) == 0:
             return None
         if len(movie_exists) == 0:
@@ -59,55 +60,81 @@ class Movies:
                 update_movie['Director'] = director
             return "Movie Updated!"
 
-
-
-
 movies_db = Movies()
 ###############################################################################
+@app.route('/')
 
-@app.route('/movies', methods=['GET', 'POST'])
-def inicio():
-    if request.method == 'POST':
-        print (movies_db.add_movie(request.form['name'], request.form['year'], request.form['director']))
-        message = movies_db.show_movies()
-        return message
+def index():
+    return redirect(url_for('home'))
 
-    message = movies_db.show_movies()
-    return message
 ###############################################################################
 
-@app.route('/delete', methods=['GET', 'POST'])
+@app.route('/home', methods=['GET'])
+def home():
+    return render_template('home.html')
+
+###############################################################################
+
+@app.route('/show', methods=['GET'])
+def show():
+    if request.method == 'GET':
+        if type(movies_db.show_movies()) == str:
+            movies = movies_db.show_movies()
+            show_message = True
+            return render_template('show.html', movies = movies, show_message = show_message)
+
+        movies = movies_db.show_movies()
+        show_message = False
+        return render_template('show.html', movies = movies, show_message = show_message)
+
+
+
+###############################################################################
+
+@app.route('/add', methods=['GET', 'POST'])
+def add():
+    if request.method == 'POST':
+        movies_db.add_movie(request.form['name'], request.form['year'], request.form['director'])
+        message = "Added: %s" % (request.form['name'])
+        return redirect(url_for('show', message = message))
+
+    return render_template('add.html')
+
+
+###############################################################################
+
+@app.route('/delete', methods=['POST'])
 def delete():
     if request.method == 'POST':
         if movies_db.movie_check(request.form['name']) == None:
-            return "There are no movies in the database."
-        elif movies_db.movie_check(request.form['name']) == False:
-            return "That movie does not exists."
-        elif movies_db.movie_check(request.form['name']) == True:
-            message = movies_db.delete_movie(request.form['name'])
-            if len(movies_db.movies_list) == 0:
-                return "There are no movies in the database."
-            return message
+            message = "There are not movies in the database."
+            return redirect(url_for('show', message = message))
 
-    message = movies_db.show_movies()
-    return message
+        elif movies_db.movie_check(request.form['name']) == False:
+            message = "That movie does not exists."
+            return redirect(url_for('show', message = message))
+
+        elif movies_db.movie_check(request.form['name']) == True:
+            movies_db.delete_movie(request.form['name'])
+            message = "Movie deleted: %s" % (request.form['name'])
+            if len(movies_db.movies_list) == 0:
+                return redirect(url_for('show'))
+            return redirect(url_for('show', message = message))
 
 ###############################################################################
 
-@app.route('/modify', methods=['GET', 'PUT'])
+@app.route('/modify', methods=['POST'])
 def modify():
-    if request.method == 'PUT':
-        if request.form['moviename'] == '':
-            return "You must select a movie."
-        if (request.form['name'] == '') and (request.form['year'] == '') and (request.form['director'] == ''):
-            message = movies_db.show_movies()
+    if request.method == 'POST':
+        movies_db.modify_movie(request.form['moviename'], request.form['name'], request.form['year'], request.form['director'])
+        message = "Modified: %s" % (request.form['moviename'])
+        return redirect(url_for('show', message = message))
 
-        print (movies_db.modify_movie(request.form['moviename'], request.form['name'], request.form['year'], request.form['director']))
-        message = movies_db.show_movies()
-        return message
+###############################################################################
 
-    message = movies_db.show_movies()
-    return message
+@app.errorhandler(404)
+def not_found(error):
+    return render_template('404.html'), 404
 
 ###############################################################################
 app.run(debug=True)
