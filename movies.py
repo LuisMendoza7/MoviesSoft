@@ -1,66 +1,52 @@
-from flask import Flask, request, jsonify, render_template, url_for, redirect
+from flask import Flask, request, render_template, url_for, redirect
+from flask_sqlalchemy import SQLAlchemy
 app = Flask("Movies DataBase")
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////home/luis/PyEx/FlaskProjects/MoviesSoft/movies.db'
+db = SQLAlchemy(app)
 
-class Movies:
-    def __init__(self):
-        self.movies_list = []
+class Movies(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    moviename = db.Column(db.String(50), unique=True, nullable=False)
+    year = db.Column(db.Integer, unique=True, nullable=False)
+    director = db.Column(db.String(50), unique=True, nullable=False)
 
-    def add_movie(self, *args):
-        if len(self.movies_list) > 0:
-            movie_exists = list(filter(lambda key: key["Name"] == args[0], self.movies_list))
-            if len(movie_exists) > 0:
-                return "That movie already exists."
+    def __repr__(self):
+        return '<Movie: %r>' % self.moviename
 
-            movie = {"Name": args[0], "Year": args[1], "Director": args[2]}
-            self.movies_list.append(movie)
-            return "Movie added."
+def show_movies():
+    movies_list = Movies.query.all()
+    if len(movies_list) == 0:
+        return 'There are no movies in the database.'
+    return movies_list
 
-        movie = {"Name": args[0], "Year": args[1], "Director": args[2]}
-        self.movies_list.append(movie)
-        return "Movie added."
+def add_movie(*args):
+    movie = Movies(moviename=args[0], year=args[1], director=args[2])
+    db.session.add(movie)
+    db.session.commit()
 
+def delete_movie(*args):
+    id = args[0]
+    Movies.query.filter(Movies.id == id).delete()
+    db.session.commit()
 
-    def show_movies(self):
-        if len(self.movies_list) == 0:
-            return "There are no movies in the database."
-        return self.movies_list
+def select_movie(*args):
+    id = args[0]
+    movie = Movies.query.filter_by(id = id).first()
+    return movie
 
-    def delete_movie(self, *args):
-        new_movies = [movie for movie in self.movies_list if movie["Name"] != args[0]]
-        self.movies_list = new_movies
+def modify_movie(*args):
+    id = args[0]
+    name = args[1]
+    year = args[2]
+    director = args[3]
 
-    def movie_check(self, *args):
-        movie_exists = list(filter(lambda key: key["Name"] == args[0], self.movies_list))
-        print (args[0])
-        print (movie_exists)
-        if len(self.movies_list) == 0:
-            return None
-        if len(movie_exists) == 0:
-            return False
-        return True
+    movie = Movies.query.filter_by(id = id).first()
 
-    def modify_movie(self, *args):
-        id = args[0]
-        name = args[1]
-        year = args[2]
-        director = args[3]
-        if self.movie_check(id) == None:
-            return "There are no movies in the database."
-        elif self.movie_check(id) == False:
-            return "That movie does not exists."
-        elif self.movie_check(id) == True:
-            update_movie = next(movie for movie in self.movies_list if movie['Name'] == id)
-            if (name == '') and (year == '') and (director == ''):
-                return "No changes have been made."
-            if name != '':
-                update_movie['Name'] = name
-            if year != '':
-                update_movie['Year'] = year
-            if director != '':
-                update_movie['Director'] = director
-            return "Movie Updated!"
+    movie.moviename = name
+    movie.year = year
+    movie.director = director
+    db.session.commit()
 
-movies_db = Movies()
 ###############################################################################
 @app.route('/')
 
@@ -78,57 +64,66 @@ def home():
 @app.route('/show', methods=['GET'])
 def show():
     if request.method == 'GET':
-        if type(movies_db.show_movies()) == str:
-            movies = movies_db.show_movies()
+        if type(show_movies()) == str:
             show_message = True
-            return render_template('show.html', movies = movies, show_message = show_message)
+            movies = show_movies()
+            return render_template('show.html', show_message=show_message, movies=movies)
 
-        movies = movies_db.show_movies()
         show_message = False
-        return render_template('show.html', movies = movies, show_message = show_message)
-
-
+        movies = show_movies()
+        return render_template('show.html', show_message=show_message, movies=movies)
 
 ###############################################################################
 
-@app.route('/add', methods=['GET', 'POST'])
+@app.route('/add', methods=['POST'])
 def add():
     if request.method == 'POST':
-        movies_db.add_movie(request.form['name'], request.form['year'], request.form['director'])
-        message = "Added: %s" % (request.form['name'])
-        return redirect(url_for('show', message = message))
+        if (request.form['name'] == '') or (request.form['year'] == '') or (request.form['director'] == ''):
+            message = "You can leave any empty field."
 
-    return render_template('add.html')
+            if type(show_movies()) == str:
+                show_message = True
+                movies = show_movies()
+                return render_template('show.html', show_message=show_message, movies=movies, message=message)
 
+            show_message = False
+            movies = show_movies()
+            return render_template('show.html', show_message=show_message, movies=movies, message=message)
 
-###############################################################################
-
-@app.route('/delete', methods=['POST'])
-def delete():
-    if request.method == 'POST':
-        if movies_db.movie_check(request.form['name']) == None:
-            message = "There are not movies in the database."
-            return redirect(url_for('show', message = message))
-
-        elif movies_db.movie_check(request.form['name']) == False:
-            message = "That movie does not exists."
-            return redirect(url_for('show', message = message))
-
-        elif movies_db.movie_check(request.form['name']) == True:
-            movies_db.delete_movie(request.form['name'])
-            message = "Movie deleted: %s" % (request.form['name'])
-            if len(movies_db.movies_list) == 0:
-                return redirect(url_for('show'))
-            return redirect(url_for('show', message = message))
+        add_movie(request.form['name'], request.form['year'], request.form['director'])
+        message = "Registered: %s" % (request.form['name'])
+        show_message = False
+        movies = show_movies()
+        return render_template('show.html', show_message=show_message, movies=movies, message=message)
 
 ###############################################################################
 
-@app.route('/modify', methods=['POST'])
-def modify():
+@app.route('/delete/<id>')
+def delete(id):
+    delete_movie(id)
+    message = "Movie deleted."
+
+    if type(show_movies()) == str:
+        show_message = True
+        movies = show_movies()
+        return render_template('show.html', show_message=show_message, movies=movies, message=message)
+
+    show_message = False
+    movies = show_movies()
+    return render_template('show.html', show_message=show_message, movies=movies, message=message)
+
+###############################################################################
+
+@app.route('/modify/<id>', methods=['GET','POST'])
+def modify(id):
     if request.method == 'POST':
-        movies_db.modify_movie(request.form['moviename'], request.form['name'], request.form['year'], request.form['director'])
-        message = "Modified: %s" % (request.form['moviename'])
-        return redirect(url_for('show', message = message))
+        modify_movie(request.form['id'], request.form['name'], request.form['year'], request.form['director'])
+        message = "Movie modified."
+        movie = select_movie(request.form['id'])
+        return render_template('modify.html', movie=movie, message=message)
+
+    movie = select_movie(id)
+    return render_template('modify.html', movie=movie)
 
 ###############################################################################
 
