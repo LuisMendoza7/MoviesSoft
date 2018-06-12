@@ -1,26 +1,38 @@
 {% extends 'movies.html' %}
 {% block body %}
-  <h1>Movies Database</h1>
-  <h3>Modify Movie: {{movie.moviename}}</h3>
-  <div>
-    <table border=2>
-      <tr>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Year</th>
-        <th>Director</th>
-      </tr>
-      <tr>
-        <form method="POST" action="modify" id="modify">
-          <td><input type="text" id="id" name="id" value='{{movie.id}}' readonly></td>
-          <td><input type="text" id="name" name="name" value='{{movie.moviename}}'></td>
-          <td><input type="text" id="year" name="year" value='{{movie.year}}'></td>
-          <td><input type="text" id="director" name="director" value='{{movie.director}}'></td>
+  <main class="moviemain">
+    <h1>Movies Database</h1>
+    <h3>Modify Movie: {{movie.moviename}}</h3>
+        <form class="moviedetails" method="POST" enctype="multipart/form-data">
+          <table>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Year</th>
+              <th>Director</th>
+              <th>Distributor</th>
+            </tr>
+            <tr>
+              <td><input type="text" id="id" name="id" value='{{movie.id}}' readonly></td>
+              <td><input type="text" id="name" name="name" value='{{movie.moviename}}'></td>
+              <td><input type="text" id="year" name="year" value='{{movie.year}}'></td>
+              <td><input type="text" id="director" name="director" value='{{movie.director}}'></td>
+              <td><input type="text" id="distributor" name="distributor"></td>
+              {% if movie.image == None %}
+                <td><p>No image avaliable.</p></td>
+              {% elif movie.image != None %}
+              {% endif %}
+            </tr>
+            <tr>
+              <td colspan="2"><button form="modify">Modify!</button><br></td>
+              <td colspan="2"><input type="file" name="image"></td>
+            </tr>
+          </table>
+          <img src="{{url_for('static', filename=movie.image)}}" width="200px">
         </form>
-      </tr>
-    </table>
-    <p>{{message}}</p>
-    <button type="submit" form="modify">Modify!</button><br>
-    <a href="../show">Return to all Movies.</a>
-  </div>
+      {% if show_message %}
+        <p>{{message}}</p>
+      {% endif %}
+      <a href="../show">Return to all Movies.</a>
+  </main>
 {% endblock%}

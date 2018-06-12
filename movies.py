@@ -1,14 +1,24 @@
-from flask import Flask, request, render_template, url_for, redirect
+import os
+from flask import Flask, request, render_template, url_for, redirect, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug import secure_filename
+
 app = Flask("Movies DataBase")
+# app = Flask("Movies DataBase", static_folder="images")
+
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////home/luis/PyEx/FlaskProjects/MoviesSoft/movies.db'
 db = SQLAlchemy(app)
+
+UPLOAD_FOLDER = '/home/luis/PyEx/FlaskProjects/MoviesSoft/static'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 
 class Movies(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     moviename = db.Column(db.String(50), unique=True, nullable=False)
     year = db.Column(db.Integer, unique=True, nullable=False)
     director = db.Column(db.String(50), unique=True, nullable=False)
+    image = db.Column(db.String(50), unique=True, nullable=True)
 
     def __repr__(self):
         return '<Movie: %r>' % self.moviename
@@ -20,7 +30,7 @@ def show_movies():
     return movies_list
 
 def add_movie(*args):
-    movie = Movies(moviename=args[0], year=args[1], director=args[2])
+    movie = Movies(moviename=args[0], year=args[1], director=args[2], image=args[3])
     db.session.add(movie)
     db.session.commit()
 
@@ -47,6 +57,8 @@ def modify_movie(*args):
     movie.director = director
     db.session.commit()
 
+
+
 ###############################################################################
 @app.route('/')
 
@@ -57,7 +69,14 @@ def index():
 
 @app.route('/home', methods=['GET'])
 def home():
-    return render_template('home.html')
+    if type(show_movies()) == str:
+        show_message = True
+        movies = show_movies()
+        return render_template('home.html', show_message=show_message, movies=movies)
+
+    show_message = False
+    movies = show_movies()
+    return render_template('home.html', show_message=show_message, movies=movies)
 
 ###############################################################################
 
@@ -67,34 +86,30 @@ def show():
         if type(show_movies()) == str:
             show_message = True
             movies = show_movies()
-            return render_template('show.html', show_message=show_message, movies=movies)
+            return render_template('show.html', show_message=show_message, movies=movies, active="active")
 
         show_message = False
         movies = show_movies()
-        return render_template('show.html', show_message=show_message, movies=movies)
+        return render_template('show.html', show_message=show_message, movies=movies, active="active")
 
 ###############################################################################
 
-@app.route('/add', methods=['POST'])
+@app.route('/add', methods=['POST', 'GET'])
 def add():
     if request.method == 'POST':
         if (request.form['name'] == '') or (request.form['year'] == '') or (request.form['director'] == ''):
             message = "You can leave any empty field."
+            return render_template('add.html', message = message)
 
-            if type(show_movies()) == str:
-                show_message = True
-                movies = show_movies()
-                return render_template('show.html', show_message=show_message, movies=movies, message=message)
-
-            show_message = False
-            movies = show_movies()
-            return render_template('show.html', show_message=show_message, movies=movies, message=message)
-
-        add_movie(request.form['name'], request.form['year'], request.form['director'])
+        file = request.files['image']
+        filename = secure_filename(file.filename)
+        add_movie(request.form['name'], request.form['year'], request.form['director'], filename)
         message = "Registered: %s" % (request.form['name'])
-        show_message = False
-        movies = show_movies()
-        return render_template('show.html', show_message=show_message, movies=movies, message=message)
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+        return render_template('add.html', message=message)
+
+    return render_template('add.html')
 
 ###############################################################################
 

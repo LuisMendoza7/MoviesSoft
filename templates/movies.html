@@ -2,9 +2,19 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="/static/css/style.css">
     <title>Movies Database</title>
   </head>
-  <body>
+  <body class="moviebody">
+    <header>
+      <div class="navbar">
+        <ul>
+          <li><a href="/home">Home</a></li>
+          <li><a href="/show">Movie Details</a></li>
+          <li><a href="/add">Add Movie</a></li>
+        </ul>
+      </div>
+    </header>
     {% block body %}
     {% endblock %}
   </body>
