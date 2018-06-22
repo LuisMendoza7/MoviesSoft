@@ -1,0 +1,25 @@
+{% extends 'movies.html' %}
+{% block body %}
+  <main class="moviemain">
+    <h2>{{movie.moviename}}</h2>
+    <div class="details">
+      {% if movie.image %}
+        <img src="{{url_for('static', filename=movie.image)}}" height="300px">
+      {% elif movie.image == None %}
+        <img src="/static/no_avaliable.jpeg" width="300px">
+      {% endif %}
+      <div style="display:flex; flex-direction:column;">
+        <p><strong>Director: </strong>{{movie.director}}</p>
+        <p><strong>Year: </strong>{{movie.year}}</p>
+        <p><strong>Distributor: </strong>{{movie.distributor}}</p>
+      </div>
+    </div>
+    <div class="description">
+      {% if movie.description %}
+        <p>{{movie.description}}</p>
+      {% elif movie.description == '' %}
+        <p>No description avaliable.</p>
+      {% endif %}
+    </div>
+  </main>
+{% endblock %}
