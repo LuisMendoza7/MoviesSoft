@@ -1,3 +1,7 @@
+# Create a register and login that changes the site options
+# Admin can see, change type and delete Users
+# Standar users can see all movies and it's details.
+
 import os
 from flask import Flask, request, render_template, url_for, redirect, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
