@@ -72,6 +72,13 @@ def add_movie(*args):
 
 ###############################################################################
 
+# def add_user(*args):
+#     user = Users(username=args[0], password=args[1])
+#     db.session.add(user)
+#     db.session.commit()
+
+###############################################################################
+
 def delete_movie(*args):
     id = args[0]
     Movies.query.filter(Movies.id == id).delete()
@@ -258,6 +265,13 @@ def modify(id):
 
     movie = select_movie(id)
     return render_template('modify.html', movie=movie)
+
+###############################################################################
+
+# @app.route('/register', methods=['POST'])
+# def register():
+#     if request.method == 'POST':
+#         pass
 
 ###############################################################################
 

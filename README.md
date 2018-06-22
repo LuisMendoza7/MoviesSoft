@@ -1,4 +1,4 @@
-# MoviesSoft
+# Movies Database
 Flask Movies Repository
 To activate virtual env:
 source (Folder)/bin/activate
