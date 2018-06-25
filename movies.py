@@ -53,7 +53,7 @@ def file_extension(filename):
 def show_movies():
     movies_list = Movies.query.all()
     if len(movies_list) == 0:
-        return 'There are no movies in the database.'
+        return 'Database empty.'
     return movies_list
 
 ###############################################################################
@@ -169,8 +169,14 @@ def show():
 @app.route('/add', methods=['POST', 'GET'])
 def add():
     if request.method == 'POST':
+
         if (request.form['name'] == '') or (request.form['year'] == '') or (request.form['director'] == '') or (request.form['distributor'] == ''):
             message = "You can not leave any empty field."
+            show_message = True
+            return render_template('add.html', message = message, show_message=show_message)
+
+        if request.form['year'].isalpha():
+            message = "Year field must be a number."
             show_message = True
             return render_template('add.html', message = message, show_message=show_message)
 
