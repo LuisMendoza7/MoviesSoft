@@ -3,9 +3,19 @@ from flask import Flask, request, render_template, url_for, redirect, send_from_
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug import secure_filename
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////home/luis/PyEx/FlaskProjects/MoviesSoft/movies.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app = Flask("Movies DataBase")
+
+POSTGRES = {
+'user': 'postgres',
+'pw': '12345',
+'db': 'movies',
+'host': 'localhost',
+'port': '5432'
+}
+
+# app = Flask("Movies DataBase", static_folder="images")
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////home/luis/PyEx/FlaskProjects/MoviesSoft/movies.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % POSTGRES
 db = SQLAlchemy(app)
 
 UPLOAD_FOLDER = '/home/luis/PyEx/FlaskProjects/MoviesSoft/static'
@@ -35,6 +45,7 @@ class Movies(db.Model):
     distributor = db.Column(db.String(50), unique=False, nullable=False)
     description = db.Column(db.String(500), unique=False, nullable=True)
     image = db.Column(db.String(50), unique=True, nullable=True)
+    extra = db.Column(db.String(10))
 
     def __repr__(self):
         return '<Movie: %r>' % self.moviename
@@ -282,4 +293,4 @@ def not_found(error):
     return render_template('404.html'), 404
 
 ###############################################################################
-# app.run(debug=True)
+app.run(debug=True)

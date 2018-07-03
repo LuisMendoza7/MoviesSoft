@@ -1,20 +1,21 @@
+import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# POSTGRES = {
-# 'user': 'postgres',
-# 'pw': '12345',
-# 'db': 'movies',
-# 'host': 'localhost',
-# 'port': '5432'
-# }
-#
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://%(user)s:\
-# %(pw)s@%(host)s:%(port)s/%(db)s' % POSTGRES
+POSTGRES = {
+'user': 'postgres',
+'pw': '12345',
+'db': 'movies',
+'host': 'localhost',
+'port': '5432'
+}
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % POSTGRES
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
@@ -42,6 +43,7 @@ class Movies(db.Model):
     distributor = db.Column(db.String(50), unique=False, nullable=False)
     description = db.Column(db.String(500), unique=False, nullable=True)
     image = db.Column(db.String(50), unique=True, nullable=True)
+    extra = db.Column(db.String(10))
 
     def __repr__(self):
         return '<Movie: %r>' % self.moviename
