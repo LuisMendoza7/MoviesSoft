@@ -3,8 +3,7 @@ from flask import Flask, request, render_template, url_for, redirect, send_from_
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug import secure_filename
 
-app = Flask("Movies DataBase")
-app.config.from_object(os.environ['APP_SETTINGS'])
+app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////home/luis/PyEx/FlaskProjects/MoviesSoft/movies.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -283,4 +282,4 @@ def not_found(error):
     return render_template('404.html'), 404
 
 ###############################################################################
-app.run(debug=True)
+# app.run(debug=True)

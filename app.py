@@ -1,12 +1,16 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
+from flask_migrate import Migrate, MigrateCommand
+from flask_script import Manager
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////home/luis/PyEx/FlaskProjects/MoviesSoft/movies.db'
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
+manager = Manager(app)
+
+manager.add_command('db', MigrateCommand)
 
 class Users(db.Model):
     id = db.Column(db.Integer, primary_key = True)
@@ -31,3 +35,5 @@ class Movies(db.Model):
 
     def __repr__(self):
         return '<Movie: %r>' % self.moviename
+
+manager.run()
