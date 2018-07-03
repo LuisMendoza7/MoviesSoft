@@ -1,8 +1,3 @@
-# App.py is used for modify the database.
-# To add new tables, create a new class with it's respective columns and tablename.
-# To delete a table, delete it's class.
-# flask db init -> flask db migrate -> flask db upgrade
-
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate

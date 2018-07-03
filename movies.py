@@ -4,8 +4,9 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug import secure_filename
 
 app = Flask("Movies DataBase")
-# app = Flask("Movies DataBase", static_folder="images")
+app.config.from_object(os.environ['APP_SETTINGS'])
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////home/luis/PyEx/FlaskProjects/MoviesSoft/movies.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 UPLOAD_FOLDER = '/home/luis/PyEx/FlaskProjects/MoviesSoft/static'
