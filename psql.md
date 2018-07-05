@@ -91,3 +91,41 @@ Schema |    Name    | Type  | Owner
 public |    name    | table | rolname
 (1 row)
 ```
+
+
+### PostgreSQL Migration
+##### 1. Postgres password
+By defaul the postgres user does not have a password, and this may cause some conflicts in the connection or other actions.
+
+Inside `psql` sheel we can update or modify our password:
+```
+postgres=# ALTER USER postgres PASSWORD 'password';
+ALTER ROLE            #Message of successful modify
+```
+##### 2. Migration File
+If we want to migrate a database model to PostgreSQL, first, we need to create our database(with the same name) in PostgreSQL and then, modify our migrations file.
+
+First of all, we need to start our migration, the migration init must have the initial database.
+```
+$ python migrate.py db init
+```
+Then after we have started the migration, we have to modify our file, adding our paths and configuration of PostgreSQL:
+```python
+POSTGRES = {
+'user': 'postgres',
+'pw': 'password',
+'db': 'dbname',
+'host': 'localhost',
+'port': '5432'
+}
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % POSTGRES
+```
+**Do not forget to comment or delete the path of the other database.**
+
+After modifying our migration file, we can continue:
+```
+$ python migrate.py db migrate
+$ python migrate.py db upgrade
+```
+After finishing with the migration, we can access to our database in PostgreSQL

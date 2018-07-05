@@ -15,6 +15,7 @@ POSTGRES = {
 'port': '5432'
 }
 
+# DATABASE_URL="sqlite:////home/luis/PyEx/FlaskProjects/MoviesSoft/movies.db"
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % POSTGRES
 
 db = SQLAlchemy(app)
