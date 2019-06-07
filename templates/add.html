@@ -1,0 +1,28 @@
+{% extends 'movies.html' %}
+{% block body %}
+  <main class="moviemain">
+    <h2>Add a new movie</h2>
+    <form class="addmovie" method="POST" action="add" enctype="multipart/form-data">
+      <label for="name">*Movie Name: </label>
+      <input type="text" name="name" id="name" maxlength="50">
+      <label for="year">*Year: </label>
+      <input type="text" name="year" id="year">
+      <label for="director">*Director: </label>
+      <input type="text" name="director" id="director">
+      <label for="distributor">*Distruibutor: </label>
+      <input type="text" name="distributor" id="distributor">
+      <label for="description">Description</label>
+      <textarea name="description" id="description" cols="50" rows="3" style="resize:none;" maxlength="500"></textarea>
+      <label for="image">Movie Picture: </label>
+      <input type="file" name="image" id="image" style="color: white;">
+      <div>
+        <button type="reset">Reset!</button>
+        <button type="submit">Add Movie!</button>
+        <p class="message">*These fields are obligatory.</p>
+        {% if show_message %}
+          <p class="message">{{message}}</p>
+        {% endif %}
+      </div>
+    </form>
+  </main>
+{% endblock %}

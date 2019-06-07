@@ -1,0 +1,44 @@
+{% extends 'movies.html' %}
+{% block body %}
+  <main class="moviemain">
+    <h2>Movies Database</h2>
+    <h3>Modify Movie: {{movie.moviename}}</h3>
+        <form class="moviedetails" action="modify" method="POST" enctype="multipart/form-data">
+          <table>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Year</th>
+              <th>Director</th>
+              <th>Distributor</th>
+            </tr>
+            <tr>
+              <td><input type="text" id="id" name="movieid" value='{{movie.id}}' readonly></td>
+              <td><input type="text" id="name" name="name" value='{{movie.moviename}}'></td>
+              <td><input type="text" id="year" name="year" value='{{movie.year}}'></td>
+              <td><input type="text" id="director" name="director" value='{{movie.director}}'></td>
+              <td><input type="text" id="distributor" name="distributor" value="{{movie.distributor}}"></td>
+            </tr>
+            <tr>
+              <th colspan="5"><label>Description</label></th>
+            </tr>
+            <tr>
+              <td colspan="5"><textarea cols="110" rows="6" name="description" id="description" maxlength="500" style="resize:none;">{{movie.description}}</textarea></td>
+            </tr>
+            <tr>
+              <td colspan="2"><button type="submit">Modify!</button></td>
+              <td colspan="2"><input type="file" name="image" style="color:white;"></td>
+            </tr>
+          </table>
+          {% if movie.image == None %}
+            <p>No image avaliable.</p>
+          {% elif movie.image != None %}
+            <img src="{{url_for('static', filename=movie.image)}}" width="200px">
+          {% endif %}
+        </form>
+      {% if show_message %}
+        <p>{{message}}</p>
+      {% endif %}
+      <a href="../show">Return to all Movies.</a>
+  </main>
+{% endblock%}

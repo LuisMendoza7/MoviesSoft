@@ -1,0 +1,37 @@
+{% extends 'movies.html' %}
+{% block body %}
+  {% if show_message %}
+    <p>There are no movies in the database.</p>
+  {% elif show_message == False %}
+    <div class="moviecontainer">
+      {% for movie in movies %}
+      <div class="moviebox">
+        {% if movie.image != None %}
+        <a class="image" href="/movie/{{movie.id}}">
+          <img src="{{url_for('static', filename=movie.image)}}" width="250px">
+          <div class="text-block">
+            {% if movie.description %}
+              <p>{{movie.description}}</p>
+            {% elif movie.description == '' %}
+              <p>No description avaliable.</p>
+            {% endif %}
+          </div>
+        </a>
+        {% elif movie.image == None %}
+          <a class="image" href="/movie/{{movie.id}}">
+            <img src="/static/no_avaliable.jpeg" width="250px">
+            <div class="text-block">
+              {% if movie.description %}
+                <p>{{movie.description}}</p>
+              {% elif movie.description == '' %}
+                <p>No description avaliable.</p>
+              {% endif %}
+            </div>
+          </a>
+        {% endif %}
+        <h4>{{movie.moviename}}</h4>
+      </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endblock %}

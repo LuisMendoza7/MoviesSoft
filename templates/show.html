@@ -1,0 +1,35 @@
+{% extends 'movies.html' %}
+{% block body %}
+  <main class="moviemain">
+    <h2>Movies List</h2>
+    {% if show_message %}
+      <p>{{movies}}</p>
+    {% elif show_message == False %}
+      <div class="showmovies">
+        <table>
+          <thead class="tablehead">
+            <tr>
+              <th>Name</th>
+              <th>Year</th>
+              <th>Director</th>
+              <th>Distributor</th>
+              <th>Delete</th>
+            </tr>
+          </thead>
+          <tbody class="scrollablecontent">
+            {% for movie in movies %}
+              <tr>
+                <td><a href="/modify/{{movie.id}}">{{movie.moviename}}</a></td>
+                <td><a href="/modify/{{movie.id}}">{{movie.year}}</a></td>
+                <td><a href="/modify/{{movie.id}}">{{movie.director}}</a></td>
+                <td><a href="/modify/{{movie.id}}">{{movie.distributor}}</a></td>
+                <td><a class="button" href="/delete/{{movie.id}}"></a></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endif %}
+    <p class="message">{{message}}</p>
+  </main>
+{% endblock %}
