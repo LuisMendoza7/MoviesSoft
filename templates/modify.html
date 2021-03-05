@@ -1,0 +1,26 @@
+{% extends 'movies.html' %}
+{% block body %}
+  <h1>Movies Database</h1>
+  <h3>Modify Movie: {{movie.moviename}}</h3>
+  <div>
+    <table border=2>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Year</th>
+        <th>Director</th>
+      </tr>
+      <tr>
+        <form method="POST" action="modify" id="modify">
+          <td><input type="text" id="id" name="id" value='{{movie.id}}' readonly></td>
+          <td><input type="text" id="name" name="name" value='{{movie.moviename}}'></td>
+          <td><input type="text" id="year" name="year" value='{{movie.year}}'></td>
+          <td><input type="text" id="director" name="director" value='{{movie.director}}'></td>
+        </form>
+      </tr>
+    </table>
+    <p>{{message}}</p>
+    <button type="submit" form="modify">Modify!</button><br>
+    <a href="../show">Return to all Movies.</a>
+  </div>
+{% endblock%}
